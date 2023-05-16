@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Boilerplate builder for backend applications",
   "main": "./src/index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,5 +23,8 @@
   "homepage": "https://github.com/Backend-Builders/backend-builder#readme",
   "devDependencies": {
     "eslint": "^8.40.0"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^1.1.3"
   }
 }
