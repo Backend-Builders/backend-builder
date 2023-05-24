@@ -1,0 +1,35 @@
+{
+  "name": "backend-builder",
+  "version": "1.0.0",
+  "description": "Boilerplate builder for backend applications",
+  "keywords": [
+    "backend",
+    "boilerplate"
+  ],
+  "homepage": "https://github.com/Backend-Builders/backend-builder#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Backend-Builders/backend-builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Backend-Builders/backend-builder/issues"
+  },
+  "maintainers": [
+    "Paulo Henrique Lima <limapaulobsb@gmail.com> (https://phlima.com/)"
+  ],
+  "contributors": [],
+  "license": "MIT",
+  "main": "./src/index.js",
+  "type": "module",
+  "bin": "./src/index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "eslint": "^8.40.0"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^1.1.3"
+  }
+}
