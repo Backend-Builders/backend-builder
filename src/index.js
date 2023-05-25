@@ -15,13 +15,19 @@ const projectType = await select({
   choices,
 });
 
-// Sets project directory paths
+// Set project directory paths
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const boilerplatePath = `${__dirname}/boilerplates/${projectType}`;
 const projectPath = `./${projectName}`;
 
-// Copies the boilerplate structure, including subdirectories and files
+// Copy boilerplate structure, including subdirectories and files
 fs.cpSync(boilerplatePath, projectPath, { recursive: true });
+
+// Change project name in the package.json file
+const data = fs.readFileSync(`./${projectPath}/package.json`, { encoding: 'utf8' });
+const newDataObj = JSON.parse(data);
+newDataObj.name = projectName;
+fs.writeFileSync(`./${projectPath}/package.json`, JSON.stringify(newDataObj, null, 2));
 
 console.log(`Project ${projectName} successfully created!`);
