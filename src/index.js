@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import choices from './choices.js';
 
 // CLI interactions
-const projectName = await input({ message: 'Enter the project name:' });
+const projectName = await input({ message: 'Enter the project name:' })
 
 const projectType = await select({
   message: 'Select the project type:',
