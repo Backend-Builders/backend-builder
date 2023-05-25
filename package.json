@@ -15,13 +15,19 @@
     "url": "https://github.com/Backend-Builders/backend-builder/issues"
   },
   "maintainers": [
+    "Deivid Borges <deividmborges@gmail.com>",
+    "Filipe Ferreira Paulo <filipef.paulo@gmail.com>",
     "Paulo Henrique Lima <limapaulobsb@gmail.com> (https://phlima.com/)"
   ],
-  "contributors": [],
+  "contributors": [
+    "Renan Oliveira <oliveira.renan.rg@gmail.com>",
+    "Ricardo do Nascimento Anjos <ricardoanj.14@gmail.com>",
+    "Walter Tadeu Frazão  <walter.tad@hotmail.com>"
+  ],
   "license": "MIT",
   "main": "./src/index.js",
-  "type": "module",
   "bin": "./src/index.js",
+  "type": "module",
   "scripts": {
     "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
