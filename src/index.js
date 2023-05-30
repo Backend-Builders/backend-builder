@@ -10,9 +10,9 @@ import { runCLI } from './cli.js';
 import { loading } from './utils/index.js';
 
 // CLI interactions
-const { projectName, projectDetails, projectType } = await runCLI();
+const [projectName, projectDetails, projectType] = await runCLI();
 
-// Starts installation process
+// Start installation process
 const stream = createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -26,7 +26,7 @@ stream.on('close', () => {
 stream.output.write('Copying files and installing dependencies...\n');
 const loadingInterval = loading(stream, 'monkey', 250);
 
-// Sets project directory paths
+// Set project directory paths
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const boilerplatePath = `${__dirname}/boilerplates/${projectType}`;
