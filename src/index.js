@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import input from '@inquirer/input';
 import select from '@inquirer/select';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import * as fs from 'fs';
 import { exec } from 'child_process';
+import * as fs from 'fs';
+import { createInterface } from 'readline';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 import choices from './choices.js';
+import { loading } from './utils/index.js';
 
 // CLI interactions
 const projectName = await input({ message: 'Enter the project name:' });
@@ -15,6 +17,20 @@ const projectType = await select({
   message: 'Select the project type:',
   choices,
 });
+
+// Starts installation process
+const stream = createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+stream.on('close', () => {
+  stream.output.write('\n');
+  process.exit(0);
+});
+
+stream.output.write('Copying files and installing dependencies...\n');
+const loadingInterval = loading(stream, 'monkey', 250);
 
 // Sets project directory paths
 const __filename = fileURLToPath(import.meta.url);
@@ -25,9 +41,7 @@ const projectPath = `./${projectName}`;
 // Copies the boilerplate structure, including subdirectories and files
 fs.cpSync(boilerplatePath, projectPath, { recursive: true });
 
-console.log(`Project ${projectName} successfully created!`);
-
-// Define path to install depencies and run command
+// Install the dependencies and finish the process
 const navigateCommand = `cd ${projectName}`;
 const installCommand = 'npm i';
 
@@ -36,9 +50,20 @@ exec(`${navigateCommand} && ${installCommand}`, (error, stdout, stderr) => {
     console.error(`Error: ${error.message}`);
     return;
   }
+
   if (stderr) {
     console.error(`Command error: ${stderr}`);
     return;
   }
-  console.log(`Dependencies installed successfully on ${projectName}`);
+
+  clearInterval(loadingInterval);
+  stream.output.write(`\rProject \x1b[33m${projectName}\x1b[0m successfully created!`);
+  stream.close();
 });
+
+// FOR TESTING PURPOSES
+// setTimeout(() => {
+//   clearInterval(loadingInterval);
+//   stream.output.write('\rProject \x1b[33mnode-tests\x1b[0m successfully created!');
+//   stream.close();
+// }, 3000);
