@@ -1,22 +1,16 @@
 #!/usr/bin/env node
-import input from '@inquirer/input';
-import select from '@inquirer/select';
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import { createInterface } from 'readline';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
 
-import choices from './choices.js';
+import { runCLI } from './cli.js';
 import { loading } from './utils/index.js';
 
 // CLI interactions
-const projectName = await input({ message: 'Enter the project name:' });
-
-const projectType = await select({
-  message: 'Select the project type:',
-  choices,
-});
+const { projectName, projectDetails, projectType } = await runCLI();
 
 // Starts installation process
 const stream = createInterface({
@@ -38,8 +32,21 @@ const __dirname = dirname(__filename);
 const boilerplatePath = `${__dirname}/boilerplates/${projectType}`;
 const projectPath = `./${projectName}`;
 
-// Copies the boilerplate structure, including subdirectories and files
+// Copy boilerplate structure, including subdirectories and files
 fs.cpSync(boilerplatePath, projectPath, { recursive: true });
+
+// Change project details in the package.json and copy license file
+const data = fs.readFileSync(`${projectPath}/package.json`, { encoding: 'utf8' });
+let dataObj = JSON.parse(data);
+dataObj.name = projectName;
+
+if (Object.keys(projectDetails).length !== 0) {
+  dataObj = { ...dataObj, ...projectDetails };
+  const licensePath = `${__dirname}/licenses/${projectDetails.license}`;
+  fs.cpSync(licensePath, projectPath, { recursive: true });
+}
+
+fs.writeFileSync(`${projectPath}/package.json`, `${JSON.stringify(dataObj, null, 2)}\n`);
 
 // Install the dependencies and finish the process
 const navigateCommand = `cd ${projectName}`;

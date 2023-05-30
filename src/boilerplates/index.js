@@ -1,14 +1,14 @@
-const choices = [
+const boilerplates = [
   {
-    name: 'Node/Express',
     value: 'node-express',
+    name: 'Node/Express',
     description: 'Node/Express Server',
   },
   {
-    name: 'Node/Express with Typescript',
     value: 'node-express-ts',
+    name: 'Node/Express with Typescript',
     description: 'Node/Express Server built with TypeScript',
   },
 ];
 
-export default choices;
+export default boilerplates;
