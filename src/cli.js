@@ -1,20 +1,32 @@
+import * as fs from 'fs';
 import { confirm, input, select } from '@inquirer/prompts';
 
 import boilerplates from './boilerplates/index.js';
 import licenses from './licenses/index.js';
 
 async function runCLI() {
-  const projectName = await input({
-    message: 'Enter the project name:',
-    default: 'my-new-project',
-  });
+  let projectName = '';
+  let isTaken = false;
+  let projectDetails = {};
+
+  do {
+    projectName = await input({
+      message: 'Enter the project name:',
+      default: 'my-new-project',
+    });
+
+    const contents = fs.readdirSync('./');
+    isTaken = contents.includes(projectName);
+
+    if (isTaken) {
+      console.log('A folder with that name already exists.');
+    }
+  } while (isTaken);
 
   const detailsConfirmation = await confirm({
     message: 'Do you want to provide more details?',
     default: false,
   });
-
-  let projectDetails = {};
 
   if (detailsConfirmation) {
     let dataConfirmation = false;

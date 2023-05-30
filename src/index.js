@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
+import * as fs from 'fs';
+import { createInterface } from 'readline';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { exec } from 'child_process';
-import * as fs from 'fs';
-import { createInterface } from 'readline';
 
 import { runCLI } from './cli.js';
 import { loading } from './utils/index.js';
