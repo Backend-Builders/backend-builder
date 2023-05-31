@@ -2,6 +2,9 @@
   "name": "node-express",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
   "main": "./src/server.js",
   "type": "module",
   "scripts": {
@@ -9,9 +12,6 @@
     "dev": "nodemon .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
