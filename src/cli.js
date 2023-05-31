@@ -1,26 +1,45 @@
+import * as fs from 'fs';
 import { confirm, input, select } from '@inquirer/prompts';
 
 import boilerplates from './boilerplates/index.js';
 import licenses from './licenses/index.js';
 
 async function runCLI() {
-  const projectName = await input({
+  // Prompt for project name
+  const nameValidation = (str) => {
+    const re = /^[a-zA-Z0-9._-]+$/;
+    const contents = fs.readdirSync('./');
+
+    if (!re.test(str)) {
+      return 'You must provide a valid name.';
+    }
+
+    if (contents.includes(str)) {
+      return 'A folder with this name already exists.';
+    }
+
+    return true;
+  };
+
+  const name = await input({
     message: 'Enter the project name:',
     default: 'my-new-project',
+    validate: nameValidation,
   });
+
+  // Prompt for project details
+  let details = {};
 
   const detailsConfirmation = await confirm({
     message: 'Do you want to provide more details?',
     default: false,
   });
 
-  let projectDetails = {};
-
   if (detailsConfirmation) {
     let dataConfirmation = false;
 
-    do {
-      projectDetails = {
+    while (!dataConfirmation) {
+      details = {
         version: await input({ message: 'version:', default: '1.0.0' }),
         description: await input({ message: 'description:' }),
         keywords: await input({ message: 'keywords:' }),
@@ -28,18 +47,19 @@ async function runCLI() {
         license: await select({ message: 'Choose a license:', choices: licenses }),
       };
 
-      projectDetails.keywords = projectDetails.keywords.split(', ');
-      console.log(`\n${JSON.stringify(projectDetails, null, 2)}\n`);
+      details.keywords = details.keywords.split(', ');
+      console.log(`\n${JSON.stringify(details, null, 2)}\n`);
       dataConfirmation = await confirm({ message: 'Is this information correct?' });
-    } while (!dataConfirmation);
+    }
   }
 
-  const projectType = await select({
+  // Prompt for project type
+  const type = await select({
     message: 'Select the project type:',
     choices: boilerplates,
   });
 
-  return { projectName, projectDetails, projectType };
+  return [name, details, type];
 }
 
 export { runCLI };
