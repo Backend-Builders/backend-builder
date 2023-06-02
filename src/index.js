@@ -31,23 +31,18 @@ const loadingInterval = loading(stream, 'monkey', 250);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const boilerplatePath = `${__dirname}/boilerplates/${projectType}`;
-const projectPath = `./${projectName}`;
 
 // Copy boilerplate structure, including subdirectories and files
-fs.cpSync(boilerplatePath, projectPath, { recursive: true });
+fs.cpSync(boilerplatePath, projectName, { recursive: true });
 
-// Change project details in the package.json and copy license file
-// const data = fs.readFileSync(`${projectPath}/package.json`, { encoding: 'utf8' });
-// let dataObj = JSON.parse(data);
-// dataObj.name = projectName;
+// Perform treatments depending on the type of project
+config[projectType].runTreatments(projectName, projectDetails);
 
-// if (Object.keys(projectDetails).length !== 0) {
-//   dataObj = { ...dataObj, ...projectDetails };
-//   const licensePath = `${__dirname}/licenses/${projectDetails.license}`;
-//   fs.cpSync(licensePath, projectPath, { recursive: true });
-// }
-
-// fs.writeFileSync(`${projectPath}/package.json`, `${JSON.stringify(dataObj, null, 2)}\n`);
+// Copy license file
+if (Object.keys(projectDetails).includes('license')) {
+  const licensePath = `${__dirname}/licenses/${projectDetails.license}`;
+  fs.cpSync(licensePath, projectName, { recursive: true });
+}
 
 // Install the dependencies and finish the process
 const commands = config[projectType].commandList.join(' && ');
