@@ -1,4 +1,4 @@
-const licenses = [
+export default [
   {
     value: 'Apache-2.0',
     description: 'Apache License 2.0',
@@ -20,5 +20,3 @@ const licenses = [
     description: 'Mozilla Public License 2.0',
   },
 ];
-
-export default licenses;

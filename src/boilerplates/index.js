@@ -1,4 +1,4 @@
-const boilerplates = [
+export default [
   {
     value: 'node-express',
     name: 'Node/Express',
@@ -15,5 +15,3 @@ const boilerplates = [
     description: 'Python/Flask Server',
   },
 ];
-
-export default boilerplates;

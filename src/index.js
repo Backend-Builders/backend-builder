@@ -8,6 +8,7 @@ import { exec } from 'child_process';
 
 import { runCLI } from './cli.js';
 import { loading } from './utils/index.js';
+import config from './config/index.js';
 
 // CLI interactions
 const [projectName, projectDetails, projectType] = await runCLI();
@@ -36,35 +37,34 @@ const projectPath = `./${projectName}`;
 fs.cpSync(boilerplatePath, projectPath, { recursive: true });
 
 // Change project details in the package.json and copy license file
-const data = fs.readFileSync(`${projectPath}/package.json`, { encoding: 'utf8' });
-let dataObj = JSON.parse(data);
-dataObj.name = projectName;
+// const data = fs.readFileSync(`${projectPath}/package.json`, { encoding: 'utf8' });
+// let dataObj = JSON.parse(data);
+// dataObj.name = projectName;
 
-if (Object.keys(projectDetails).length !== 0) {
-  dataObj = { ...dataObj, ...projectDetails };
-  const licensePath = `${__dirname}/licenses/${projectDetails.license}`;
-  fs.cpSync(licensePath, projectPath, { recursive: true });
-}
+// if (Object.keys(projectDetails).length !== 0) {
+//   dataObj = { ...dataObj, ...projectDetails };
+//   const licensePath = `${__dirname}/licenses/${projectDetails.license}`;
+//   fs.cpSync(licensePath, projectPath, { recursive: true });
+// }
 
-fs.writeFileSync(`${projectPath}/package.json`, `${JSON.stringify(dataObj, null, 2)}\n`);
+// fs.writeFileSync(`${projectPath}/package.json`, `${JSON.stringify(dataObj, null, 2)}\n`);
 
 // Install the dependencies and finish the process
-const navigateCommand = `cd ${projectName}`;
-const installCommand = 'npm i';
+const commands = config[projectType].commandList.join(' && ');
 
-exec(`${navigateCommand} && ${installCommand}`, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error: ${error.message}`);
-    return;
-  }
-
-  if (stderr) {
-    console.error(`Command error: ${stderr}`);
-    return;
-  }
-
+exec(commands, { cwd: `./${projectName}` }, (error, stdout, stderr) => {
   clearInterval(loadingInterval);
-  stream.output.write(`\rProject \x1b[33m${projectName}\x1b[0m successfully created!`);
+
+  if (error) {
+    stream.output.write(`\rError: ${error.message}`);
+  } else {
+    if (stderr) {
+      stream.output.write(`\r${stderr}`);
+    }
+
+    stream.output.write(`\rProject \x1b[33m${projectName}\x1b[0m successfully created!`);
+  }
+
   stream.close();
 });
 
