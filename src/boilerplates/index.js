@@ -9,6 +9,11 @@ const boilerplates = [
     name: 'Node/Express with Typescript',
     description: 'Node/Express Server built with TypeScript',
   },
+  {
+    value: 'python-flask',
+    name: 'Python/Flask',
+    description: 'Python/Flask Server',
+  },
 ];
 
 export default boilerplates;
