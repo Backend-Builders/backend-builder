@@ -22,9 +22,10 @@ export default {
     data = lines.join('\n');
     fs.writeFileSync(`${projectPath}/setup.py`, data);
   },
-  commandList: [
+  execCommands: [
     'python3 -m venv venv',
     '. venv/bin/activate',
     'python3 setup.py install',
   ],
+  startCommands: ['. venv/bin/activate', 'python3 run.py'],
 };

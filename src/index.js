@@ -46,21 +46,29 @@ if (Object.keys(projectDetails).includes('license')) {
 }
 
 // Install the dependencies and finish the process
-const commands = config[projectType].commandList.join(' && ');
+const execCommands = config[projectType].execCommands.join(' && ');
 
-exec(commands, { cwd: `./${projectPath}` }, (error, stdout, stderr) => {
+exec(execCommands, { cwd: `./${projectPath}` }, (error, stdout, stderr) => {
   clearInterval(loadingInterval);
 
   if (error) {
     stream.output.write(`\rError: ${error.message}`);
   } else {
     if (stderr) {
-      stream.output.write(`\r${stderr}`);
+      stream.output.write(`\r${stderr}\n`);
     }
 
+    const startCommands = config[projectType].startCommands.join('\n  ');
+
     stream.output.write(
-      `\rProject \x1b[33m${projectDetails.name}\x1b[0m successfully created!`
+      `\rProject \x1b[33m${projectDetails.name}\x1b[0m successfully created!\n`
     );
+
+    stream.output.write('You can start by typing:\n\n');
+    stream.output.write('\x1b[90m');
+    stream.output.write(`  cd ${projectDetails.name}\n  ${startCommands}\n\n`);
+    stream.output.write('\x1b[0m');
+    stream.output.write('Happy coding!\n');
   }
 
   stream.close();

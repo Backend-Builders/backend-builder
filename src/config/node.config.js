@@ -6,10 +6,12 @@ export default {
     const data = fs.readFileSync(`${projectPath}/package.json`, { encoding: 'utf8' });
     let dataObj = JSON.parse(data);
     dataObj = { ...dataObj, ...projectDetails };
+
     fs.writeFileSync(
       `${projectPath}/package.json`,
       `${JSON.stringify(dataObj, null, 2)}\n`
     );
   },
-  commandList: ['npm install'],
+  execCommands: ['npm install'],
+  startCommands: ['npm run dev'],
 };
