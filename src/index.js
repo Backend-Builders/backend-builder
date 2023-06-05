@@ -11,7 +11,7 @@ import { loading } from './utils/index.js';
 import config from './config/index.js';
 
 // CLI interactions
-const [projectName, projectDetails, projectType] = await runCLI();
+const { projectDetails, projectType } = await runCLI();
 
 // Start installation process
 const stream = createInterface({
@@ -31,23 +31,24 @@ const loadingInterval = loading(stream, 'monkey', 250);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const boilerplatePath = `${__dirname}/boilerplates/${projectType}`;
+const projectPath = `./${projectDetails.name}`;
 
 // Copy boilerplate structure, including subdirectories and files
-fs.cpSync(boilerplatePath, projectName, { recursive: true });
+fs.cpSync(boilerplatePath, projectPath, { recursive: true });
 
 // Perform treatments depending on the type of project
-config[projectType].runTreatments(projectName, projectDetails);
+config[projectType].runTreatments(projectPath, projectDetails);
 
 // Copy license file
 if (Object.keys(projectDetails).includes('license')) {
   const licensePath = `${__dirname}/licenses/${projectDetails.license}`;
-  fs.cpSync(licensePath, projectName, { recursive: true });
+  fs.cpSync(licensePath, projectPath, { recursive: true });
 }
 
 // Install the dependencies and finish the process
 const commands = config[projectType].commandList.join(' && ');
 
-exec(commands, { cwd: `./${projectName}` }, (error, stdout, stderr) => {
+exec(commands, { cwd: `./${projectPath}` }, (error, stdout, stderr) => {
   clearInterval(loadingInterval);
 
   if (error) {
@@ -57,7 +58,9 @@ exec(commands, { cwd: `./${projectName}` }, (error, stdout, stderr) => {
       stream.output.write(`\r${stderr}`);
     }
 
-    stream.output.write(`\rProject \x1b[33m${projectName}\x1b[0m successfully created!`);
+    stream.output.write(
+      `\rProject \x1b[33m${projectDetails.name}\x1b[0m successfully created!`
+    );
   }
 
   stream.close();

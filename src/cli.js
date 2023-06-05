@@ -5,6 +5,11 @@ import boilerplates from './boilerplates/index.js';
 import licenses from './licenses/index.js';
 
 async function runCLI() {
+  const answers = {
+    projectDetails: {},
+    projectType: '',
+  };
+
   // Prompt for project name
   const nameValidation = (str) => {
     const re = /^[a-zA-Z0-9._-]+$/;
@@ -21,15 +26,13 @@ async function runCLI() {
     return true;
   };
 
-  const name = await input({
+  answers.projectDetails.name = await input({
     message: 'Enter the project name:',
     default: 'my-new-project',
     validate: nameValidation,
   });
 
-  // Prompt for project details
-  let details = {};
-
+  // Prompt for more details of the project
   const detailsConfirmation = await confirm({
     message: 'Do you want to provide more details?',
     default: false,
@@ -37,9 +40,10 @@ async function runCLI() {
 
   if (detailsConfirmation) {
     let dataConfirmation = false;
+    let moreDetails = {};
 
     while (!dataConfirmation) {
-      details = {
+      moreDetails = {
         version: await input({ message: 'version:', default: '1.0.0' }),
         description: await input({ message: 'description:' }),
         keywords: await input({ message: 'keywords:' }),
@@ -47,19 +51,21 @@ async function runCLI() {
         license: await select({ message: 'Choose a license:', choices: licenses }),
       };
 
-      details.keywords = details.keywords.split(', ');
-      console.log(`\n${JSON.stringify(details, null, 2)}\n`);
+      moreDetails.keywords = moreDetails.keywords.split(', ');
+      console.log(`\n${JSON.stringify(moreDetails, null, 2)}\n`);
       dataConfirmation = await confirm({ message: 'Is this information correct?' });
     }
+
+    answers.projectDetails = { ...answers.projectDetails, ...moreDetails };
   }
 
   // Prompt for project type
-  const type = await select({
+  answers.projectType = await select({
     message: 'Select the project type:',
     choices: boilerplates,
   });
 
-  return [name, details, type];
+  return answers;
 }
 
 export { runCLI };
