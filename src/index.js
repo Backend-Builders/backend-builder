@@ -24,6 +24,8 @@ stream.on('close', () => {
   process.exit(0);
 });
 
+stream.pause(); // Prevent user input
+stream.output.write('\x1B[?25l'); // Remove the cursor
 stream.output.write('Copying files and installing dependencies...\n');
 const loadingInterval = loading(stream, 'monkey', 250);
 
@@ -52,25 +54,26 @@ exec(execCommands, { cwd: `./${projectPath}` }, (error, stdout, stderr) => {
   clearInterval(loadingInterval);
 
   if (error) {
-    stream.output.write(`\rError: ${error.message}`);
+    stream.output.write(`Error: ${error.message}`);
   } else {
     if (stderr) {
-      stream.output.write(`\r${stderr}\n`);
+      stream.output.write(`${stderr}\n`);
     }
 
     const startCommands = config[projectType].startCommands.join('\n  ');
 
     stream.output.write(
-      `\rProject \x1b[33m${projectDetails.name}\x1b[0m successfully created!\n`
+      `Project \x1b[33m${projectDetails.name}\x1b[0m successfully created!\n`
     );
 
-    stream.output.write('You can start by typing:\n\n');
+    stream.output.write('You can start by typing:\n');
     stream.output.write('\x1b[90m');
-    stream.output.write(`  cd ${projectDetails.name}\n  ${startCommands}\n\n`);
+    stream.output.write(`\n  cd ${projectDetails.name}\n  ${startCommands}\n`);
     stream.output.write('\x1b[0m');
-    stream.output.write('Happy coding!\n');
+    stream.output.write('\nHappy coding!\n');
   }
 
+  stream.output.write('\x1B[?25h'); // Return the cursor
   stream.close();
 });
 

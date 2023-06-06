@@ -4,12 +4,10 @@ function loading(stream, animation, delay) {
     monkey: ['🙈 ', '🙉 ', '🙊 '],
   };
 
-  stream.pause(); // Prevents user input
-  stream.output.write('\x1B[?25l'); // Removes the cursor
   let i = 0;
-
+  
   return setInterval(() => {
-    stream.output.write(`\r${frames[animation][i]}`);
+    stream.output.write(`${frames[animation][i]}\r`);
     i = (i + 1) % frames[animation].length;
   }, delay);
 }
