@@ -1,76 +1,72 @@
 #!/usr/bin/env node
 
 import * as fs from 'fs';
-import { createInterface } from 'readline';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { exec } from 'child_process';
 
 import { runCLI } from './cli.js';
-import { loading } from './utils/index.js';
+import { changeColor, createStream, startLoading } from './helpers.js';
+import config from './config/index.js';
 
-// CLI interactions
-const [projectName, projectDetails, projectType] = await runCLI();
+// CLI interactions to define project details, type and configuration
+const { details, type } = await runCLI();
+const { name, license } = details;
+const { runTreatments, commandList } = config[type];
 
 // Start installation process
-const stream = createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-stream.on('close', () => {
-  stream.output.write('\n');
-  process.exit(0);
-});
-
+const stream = createStream();
+stream.pause(); // Prevent user input
+stream.output.write('\x1B[?25l'); // Hide the cursor
 stream.output.write('Copying files and installing dependencies...\n');
-const loadingInterval = loading(stream, 'monkey', 250);
+const loadingInterval = startLoading(stream, 'monkey', 250);
 
 // Set project directory paths
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const boilerplatePath = `${__dirname}/boilerplates/${projectType}`;
-const projectPath = `./${projectName}`;
+const boilerplatePath = `${__dirname}/boilerplates/${type}`;
+const projectPath = `./${name}`;
 
 // Copy boilerplate structure, including subdirectories and files
 fs.cpSync(boilerplatePath, projectPath, { recursive: true });
 
-// Change project details in the package.json and copy license file
-const data = fs.readFileSync(`${projectPath}/package.json`, { encoding: 'utf8' });
-let dataObj = JSON.parse(data);
-dataObj.name = projectName;
+// Perform treatments depending on the type of project
+runTreatments(projectPath, details);
 
-if (Object.keys(projectDetails).length !== 0) {
-  dataObj = { ...dataObj, ...projectDetails };
-  const licensePath = `${__dirname}/licenses/${projectDetails.license}`;
+// Copy license file
+if (Object.keys(details).includes('license')) {
+  const licensePath = `${__dirname}/licenses/${license}`;
   fs.cpSync(licensePath, projectPath, { recursive: true });
 }
 
-fs.writeFileSync(`${projectPath}/package.json`, `${JSON.stringify(dataObj, null, 2)}\n`);
-
 // Install the dependencies and finish the process
-const navigateCommand = `cd ${projectName}`;
-const installCommand = 'npm i';
+const execCommands = commandList.exec.join(' && ');
 
-exec(`${navigateCommand} && ${installCommand}`, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error: ${error.message}`);
-    return;
-  }
-
-  if (stderr) {
-    console.error(`Command error: ${stderr}`);
-    return;
-  }
-
+exec(execCommands, { cwd: `./${projectPath}` }, (error, _stdout, stderr) => {
   clearInterval(loadingInterval);
-  stream.output.write(`\rProject \x1b[33m${projectName}\x1b[0m successfully created!`);
+
+  if (error) {
+    stream.output.write(`Error: ${error.message}\n`);
+  } else {
+    if (stderr) {
+      stream.output.write(`${stderr}\n`);
+    }
+
+    const startCommands = commandList.start.join('\n  ');
+    stream.output.write(`Project ${changeColor(name, 'yellow')} successfully created!\n`);
+    stream.output.write('You can start by typing:\n');
+    stream.output.write(changeColor(`\n  cd ${name}\n  ${startCommands}\n`, 'gray'));
+    stream.output.write('\nHappy coding!\n');
+  }
+
+  stream.output.write('\x1B[?25h'); // Display the cursor
   stream.close();
 });
 
 // FOR TESTING PURPOSES
 // setTimeout(() => {
 //   clearInterval(loadingInterval);
-//   stream.output.write('\rProject \x1b[33mnode-tests\x1b[0m successfully created!');
+//   stream.output.write(`Project ${changeColor(name, 'yellow')} successfully created!\n`);
+//   stream.output.write('\x1B[?25h'); // Display the cursor
 //   stream.close();
 // }, 3000);
