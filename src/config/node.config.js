@@ -1,17 +1,14 @@
 import * as fs from 'fs';
 
 export default {
-  runTreatments: (projectPath, projectDetails) => {
+  runTreatments: (path, details) => {
     // Change project details in package.json file
-    const data = fs.readFileSync(`${projectPath}/package.json`, { encoding: 'utf8' });
-    let dataObj = JSON.parse(data);
-    dataObj = { ...dataObj, ...projectDetails };
-
-    fs.writeFileSync(
-      `${projectPath}/package.json`,
-      `${JSON.stringify(dataObj, null, 2)}\n`
-    );
+    const data = fs.readFileSync(`${path}/package.json`, { encoding: 'utf8' });
+    const dataObj = { ...JSON.parse(data), ...details };
+    fs.writeFileSync(`${path}/package.json`, `${JSON.stringify(dataObj, null, 2)}\n`);
   },
-  execCommands: ['npm install'],
-  startCommands: ['npm run dev'],
+  commandList: {
+    exec: ['npm install'],
+    start: ['npm run dev'],
+  },
 };

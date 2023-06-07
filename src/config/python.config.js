@@ -1,31 +1,28 @@
 import * as fs from 'fs';
 
 export default {
-  runTreatments: (projectPath, projectDetails) => {
+  runTreatments: (path, details) => {
     // Change project details in setup.py file
-    let data = fs.readFileSync(`${projectPath}/setup.py`, { encoding: 'utf-8' });
+    const data = fs.readFileSync(`${path}/setup.py`, { encoding: 'utf-8' });
     const lines = data.split('\n');
 
-    for (let key in projectDetails) {
+    for (let key in details) {
       const index = lines.findIndex((line) => line.includes(`${key}=`));
       let newValue = '';
 
       if (key === 'keywords') {
-        newValue = `'${projectDetails.keywords.join(', ')}'`;
+        newValue = `'${details.keywords.join(', ')}'`;
       } else {
-        newValue = `'${projectDetails[key]}'`;
+        newValue = `'${details[key]}'`;
       }
 
       lines[index] = lines[index].replace(/'(.*?)'/g, newValue);
     }
 
-    data = lines.join('\n');
-    fs.writeFileSync(`${projectPath}/setup.py`, data);
+    fs.writeFileSync(`${path}/setup.py`, lines.join('\n'));
   },
-  execCommands: [
-    'python3 -m venv venv',
-    '. venv/bin/activate',
-    'python3 setup.py install',
-  ],
-  startCommands: ['. venv/bin/activate', 'python3 run.py'],
+  commandList: {
+    exec: ['python3 -m venv venv', '. venv/bin/activate', 'python3 setup.py install'],
+    start: ['. venv/bin/activate', 'python3 run.py'],
+  },
 };

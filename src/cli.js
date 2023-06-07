@@ -6,27 +6,27 @@ import licenses from './licenses/index.js';
 
 async function runCLI() {
   const answers = {
-    projectDetails: {},
-    projectType: '',
+    details: {},
+    type: '',
   };
 
   // Prompt for project name
-  const nameValidation = (str) => {
+  const nameValidation = (string) => {
     const re = /^[a-zA-Z0-9._-]+$/;
     const contents = fs.readdirSync('./');
 
-    if (!re.test(str)) {
+    if (!re.test(string)) {
       return 'You must provide a valid name.';
     }
 
-    if (contents.includes(str)) {
+    if (contents.includes(string)) {
       return 'A folder with this name already exists.';
     }
 
     return true;
   };
 
-  answers.projectDetails.name = await input({
+  answers.details.name = await input({
     message: 'Enter the project name:',
     default: 'my-new-project',
     validate: nameValidation,
@@ -56,11 +56,11 @@ async function runCLI() {
       dataConfirmation = await confirm({ message: 'Is this information correct?' });
     }
 
-    answers.projectDetails = { ...answers.projectDetails, ...moreDetails };
+    answers.details = { ...answers.details, ...moreDetails };
   }
 
   // Prompt for project type
-  answers.projectType = await select({
+  answers.type = await select({
     message: 'Select the project type:',
     choices: boilerplates,
   });
